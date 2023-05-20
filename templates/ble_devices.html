@@ -40,7 +40,7 @@
             <tbody>
                 {% for ble_device in ble_devices %}
                     <tr>
-                        <td><a href="{% url 'heatmap_scan' ble_device.address %}">{{ ble_device.address }}</a></td>
+                        <td>{{ ble_device.address }}</td>
                         <td><a href="{% url 'bluetooth_scan' ble_device.address %}">しょうさい</a></td>
                         <td>{{ ble_device.rssi }}</td>
                     </tr>

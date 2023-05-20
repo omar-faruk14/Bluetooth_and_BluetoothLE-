@@ -51,8 +51,50 @@ async def scan_ble_devices():
 
 
 
-# Function Sent in BLE Device
+import numpy as np
+import pandas as pd
+
+def create_heatmap(ble_devices):
+    # Create a DataFrame from ble_devices
+    df = pd.DataFrame(ble_devices)
+
+    # Convert the timestamp column to datetime type
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+
+    # Create a pivot table with addresses as rows, timestamps as columns, and RSSI values as values
+    pivot_table = df.pivot_table(index='address', columns='timestamp', values='rssi', fill_value=0)
+
+    # Convert the pivot table to a numpy array for plotting
+    heatmap_data = pivot_table.values
+
+    # Set up the heatmap plot
+    fig, ax = plt.subplots()
+    cmap = plt.cm.get_cmap('hot')
+
+    # Plot the heatmap
+    im = ax.imshow(heatmap_data, cmap=cmap)
+
+    # Configure the colorbar
+    cbar = plt.colorbar(im)
+    cbar.set_label('RSSI')
+
+    # Set labels and title
+    ax.set_xlabel('Timestamp')
+    ax.set_ylabel('Address')
+    ax.set_title('RSSI Heatmap')
+
+    # Convert the plot to an image
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    image_base64 = base64.b64encode(buf.read()).decode('utf-8').replace('\n', '')
+    buf.close()
+
+    return image_base64
+
+
 async def ble_devices(request):
     ble_devices = await scan_ble_devices()
-    return render(request, 'heatmap_device.html', {'ble_devices': ble_devices})
+    heatmap_image = create_heatmap(ble_devices)
+    return render(request, 'heatmap.html', {'heatmap_image': heatmap_image})
 
