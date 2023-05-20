@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% load static %}
+
+<!-- ======= Breadcrumbs ======= -->
+<div class="breadcrumbs">
+  <div class="page-header d-flex align-items-center" style="background-image: url('');">
+    <div class="container position-relative">
+      <div class="row d-flex justify-content-center">
+        <div class="col-lg-6 text-center">
+          <h2>Bleak Scanner Results</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+  <nav>
+    <div class="container">
+      <ol>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li>Find People</li>
+      </ol>
+    </div>
+  </nav>
+</div><!-- End Breadcrumbs -->
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      {% if ble_informations %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Address</th>
+              <th>RSSI Value</th>
+              <th>Distance</th>
+              <th>TimeStamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ble_information in ble_informations %}
+              <tr>
+                <td>{{ble_information.device_address}}</td>
+                <td>
+                  {% for rssi in ble_information.rssi_values %}
+                    {{ rssi }} dBm<br>
+                  {% endfor %}
+                </td>
+                <td>
+                  {% for cal_distance in ble_information.cal_distance %}
+                    {{ cal_distance|floatformat:2 }}m<br>
+                  {% endfor %}
+                </td>
+                <td>
+                  {% for timestamp in ble_information.timestamps %}
+                    {{ timestamp }}<br>
+                  {% endfor %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No Bluetooth devices found.</p>
+      {% endif %}
+
+{% endblock %}

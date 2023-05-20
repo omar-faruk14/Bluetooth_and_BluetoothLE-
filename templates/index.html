@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+{%block content%}
+{% load static %}
+
+
+<!-- ======= Hero Section ======= -->
+<section id="hero" class="hero">
+  <div class="container position-relative">
+    <div class="row gy-5" data-aos="fade-in">
+      <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center text-center text-lg-start">
+        <h2>Find people <span>buried underground</span></h2>
+        <p>Search for nearby Bluetooth signals.</p>
+        <p>近くの Bluetooth 信号を検索します。</p>
+        <div class="d-flex justify-content-center justify-content-lg-start">
+          <a href="{% url 'bluetooth_finder' %}" class="btn-get-started">Get Started(始めましょう)</a>
+        </div>
+      </div>
+      <div class="col-lg-6 order-1 order-lg-2">
+        <img src="{% static 'img/find_buried2.jpg' %}" class="img-fluid" alt="" data-aos="zoom-out" data-aos-delay="100">
+      </div>
+    </div>
+  </div>
+
+  <div class="icon-boxes position-relative">
+    <div class="container position-relative">
+      <div class="row gy-4 mt-5">
+
+        <div class="col-xl-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="icon-box">
+            <div class="icon"><i class="bi bi-easel"></i></div>
+            <h4 class="title"><a href="{% url 'bluetooth_finder' %}" class="stretched-link">Classic</a></h4>
+          </div>
+        </div><!--End Icon Box -->
+
+        <div class="col-xl-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="icon-box">
+            <div class="icon"><i class="bi bi-gem"></i></div>
+            <h4 class="title"><a href="{% url 'ble_devices' %}" class="stretched-link">BLE</a></h4>
+          </div>
+        </div><!--End Icon Box -->
+
+        <div class="col-xl-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+          <div class="icon-box">
+            <div class="icon"><i class="bi bi-geo-alt"></i></div>
+            <h4 class="title"><a href="https://emi-lab.jp/" class="stretched-link">Emi-Lab3</a></h4>
+          </div>
+        </div><!--End Icon Box -->
+
+        <div class="col-xl-3 col-md-6" data-aos="fade-up" data-aos-delay="500">
+          <div class="icon-box">
+            <div class="icon"><i class="bi bi-command"></i></div>
+            <h4 class="title"><a href="https://emi-lab.jp/" class="stretched-link">Emi-Lab4</a></h4>
+          </div>
+        </div><!--End Icon Box -->
+
+      </div>
+    </div>
+  </div>
+
+  </div>
+</section>
+<!-- End Hero Section -->
+  <main id="main">
+
+    <!-- ======= About Us Section ======= -->
+    <section id="about" class="about">
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-header">
+          <h2>About Project</h2>
+          <p>The objective of this project is to make it easy to locate people trapped in disasters.</p>
+          <p>災害時に閉じ込められた人を簡単に探し出せるようにすることが目的です。</p>
+        </div>
+
+      </div>
+    </section><!-- End About Us Section -->
+
+
+
+
+
+</main><!-- End #main -->
+{%endblock content%}

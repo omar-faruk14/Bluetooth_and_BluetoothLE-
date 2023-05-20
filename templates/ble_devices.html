@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{%block content%}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BLE Devices</title>
+</head>
+<body>
+    <!-- ======= Breadcrumbs ======= -->
+<div class="breadcrumbs">
+    <div class="page-header d-flex align-items-center" style="background-image: url('');">
+      <div class="container position-relative">
+        <div class="row d-flex justify-content-center">
+          <div class="col-lg-6 text-center">
+            <h2>BLE Device</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <nav>
+      <div class="container">
+        <ol>
+          <li><a href="{% url 'home' %}">Home</a></li>
+          <li>Find People</li>
+        </ol>
+      </div>
+    </nav>
+  </div><!-- End Breadcrumbs -->
+    {% if ble_devices %}
+    <table class="styled-table center">
+            <thead>
+                <tr>
+                    <th>Device Address</th>
+                    <th>Details(しょうさい)</th>
+                    <th>RSSI Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ble_device in ble_devices %}
+                    <tr>
+                        <td><a href="{% url 'heatmap_scan' ble_device.address %}">{{ ble_device.address }}</a></td>
+                        <td><a href="{% url 'bluetooth_scan' ble_device.address %}">しょうさい</a></td>
+                        <td>{{ ble_device.rssi }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No BLE devices found.</p>
+    {% endif %}
+</body>
+</html>
+
+{%endblock content%}
