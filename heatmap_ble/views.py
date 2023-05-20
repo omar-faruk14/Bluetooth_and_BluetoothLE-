@@ -10,6 +10,8 @@ import io
 import urllib, base64
 import json
 import time
+import seaborn as sns
+
 
 def index(request):
     return HttpResponse("Hello, World!")
@@ -53,6 +55,7 @@ async def scan_ble_devices():
 
 import numpy as np
 import pandas as pd
+import seaborn as sns
 
 def create_heatmap(ble_devices):
     # Create a DataFrame from ble_devices
@@ -64,24 +67,33 @@ def create_heatmap(ble_devices):
     # Create a pivot table with addresses as rows, timestamps as columns, and RSSI values as values
     pivot_table = df.pivot_table(index='address', columns='timestamp', values='rssi', fill_value=0)
 
-    # Convert the pivot table to a numpy array for plotting
-    heatmap_data = pivot_table.values
-
     # Set up the heatmap plot
-    fig, ax = plt.subplots()
-    cmap = plt.cm.get_cmap('hot')
+    fig, ax = plt.subplots(figsize=(10, 8))
 
-    # Plot the heatmap
-    im = ax.imshow(heatmap_data, cmap=cmap)
-
-    # Configure the colorbar
-    cbar = plt.colorbar(im)
-    cbar.set_label('RSSI')
+    # Map the colors to the address numbers
+    cmap = sns.color_palette("viridis", as_cmap=True)
+    sns.heatmap(pivot_table, cmap=cmap, annot=True, fmt=".0f", cbar=True, ax=ax)
 
     # Set labels and title
     ax.set_xlabel('Timestamp')
     ax.set_ylabel('Address')
     ax.set_title('RSSI Heatmap')
+
+    # Get the tick positions and labels for the x-axis
+    xticks_pos = np.arange(len(pivot_table.columns)) + 0.5
+    xticks_labels = pivot_table.columns.strftime("%H:%M:%S")
+
+    # Set the x-axis tick positions and labels
+    ax.set_xticks(xticks_pos)
+    ax.set_xticklabels(xticks_labels, rotation=45, ha='right')
+
+    # Get the tick positions and labels for the y-axis
+    yticks_pos = np.arange(len(pivot_table.index)) + 0.5
+    yticks_labels = pivot_table.index
+
+    # Set the y-axis tick positions and labels
+    ax.set_yticks(yticks_pos)
+    ax.set_yticklabels(yticks_labels)
 
     # Convert the plot to an image
     buf = io.BytesIO()
@@ -91,6 +103,7 @@ def create_heatmap(ble_devices):
     buf.close()
 
     return image_base64
+
 
 
 async def ble_devices(request):
