@@ -25,9 +25,9 @@ def calculate_distance(rssi):
     return distance
 
 # Bleak BLE Device Information Scan
-async def scan_ble_devices():
+async def scan_ble_devices(loop_count, sleep_duration):
     ble_devices = []
-    for loop_num in range(1, 6):  # Run the loop five times
+    for loop_num in range(1, loop_count + 1):  # Run the loop five times
         devices = await BleakScanner.discover()
         loop_ble_devices = []
         for device in devices:
@@ -45,13 +45,17 @@ async def scan_ble_devices():
         with open(filename, 'w') as file:
             json.dump(loop_ble_devices, file)
 
-        time.sleep(5)  # Wait for 5 seconds before the next loop
+        time.sleep(sleep_duration)  # Wait for 5 seconds before the next loop
 
     # Save all ble_devices to a JSON file
     with open('ble_devices.json', 'w') as file:
         json.dump(ble_devices, file)
 
     return ble_devices
+
+
+def settings(request):
+    return render(request, 'settings.html')
 
 def create_heatmap(ble_devices):
     if not ble_devices:
@@ -108,12 +112,15 @@ def create_heatmap(ble_devices):
 
 # ...
 
-async def ble_devices(request):
-    ble_devices = await scan_ble_devices()
-    heatmap_image = create_heatmap(ble_devices)
+async def ble_devices_finder(request):
+    if request.method == 'POST':
+        loop_count = int(request.POST['loop_count'])
+        sleep_duration = int(request.POST['sleep_duration'])
+        ble_devices = await scan_ble_devices(loop_count, sleep_duration)
+        heatmap_image = create_heatmap(ble_devices)
 
-    if heatmap_image is None:
-        return HttpResponse("No BLE devices found.")
+    else:
+        return HttpResponse("Invalid request method.")
 
     return render(request, 'heatmap.html', {'heatmap_image': heatmap_image})
 

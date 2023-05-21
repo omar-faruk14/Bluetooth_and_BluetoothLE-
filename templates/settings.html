@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% load static %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h1 class="mt-5 mb-3">Settings</h1>
+            <form method="post" action="{% url 'heatmap_scan' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="loop_count" class="form-label">Number of Loops:</label>
+                    <input type="number" id="loop_count" name="loop_count" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="sleep_duration" class="form-label">Sleep Duration (in seconds):</label>
+                    <input type="number" id="sleep_duration" name="sleep_duration" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Start Scanning</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
