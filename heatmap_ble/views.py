@@ -11,6 +11,8 @@ import urllib, base64
 import json
 import time
 import seaborn as sns
+import numpy as np
+import pandas as pd
 
 
 def index(request):
@@ -51,15 +53,15 @@ async def scan_ble_devices():
 
     return ble_devices
 
-
-
-import numpy as np
-import pandas as pd
-import seaborn as sns
-
 def create_heatmap(ble_devices):
+    if not ble_devices:
+        return None  # Return None if no BLE devices are found
+
     # Create a DataFrame from ble_devices
     df = pd.DataFrame(ble_devices)
+
+    if 'timestamp' not in df.columns:
+        return None  # Return None if 'timestamp' column is not present
 
     # Convert the timestamp column to datetime type
     df['timestamp'] = pd.to_datetime(df['timestamp'])
@@ -104,10 +106,14 @@ def create_heatmap(ble_devices):
 
     return image_base64
 
-
+# ...
 
 async def ble_devices(request):
     ble_devices = await scan_ble_devices()
     heatmap_image = create_heatmap(ble_devices)
+
+    if heatmap_image is None:
+        return HttpResponse("No BLE devices found.")
+
     return render(request, 'heatmap.html', {'heatmap_image': heatmap_image})
 
