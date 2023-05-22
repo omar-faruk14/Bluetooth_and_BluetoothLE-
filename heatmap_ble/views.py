@@ -122,5 +122,5 @@ async def ble_devices_finder(request):
     else:
         return HttpResponse("Invalid request method.")
 
-    return render(request, 'heatmap.html', {'heatmap_image': heatmap_image})
+    return render(request, 'heatmap.html', {'heatmap_image': heatmap_image,'ble_devices':ble_devices})
 
