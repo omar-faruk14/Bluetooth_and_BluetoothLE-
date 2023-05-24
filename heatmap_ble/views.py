@@ -59,49 +59,29 @@ def settings(request):
 
 def create_heatmap(ble_devices):
     if not ble_devices:
-        return None  # Return None if no BLE devices are found
-
-    # Create a DataFrame from ble_devices
+        return None  
     df = pd.DataFrame(ble_devices)
-
     if 'timestamp' not in df.columns:
-        return None  # Return None if 'timestamp' column is not present
-
-    # Convert the timestamp column to datetime type
+        return None
     df['timestamp'] = pd.to_datetime(df['timestamp'])
 
     # Create a pivot table with addresses as rows, timestamps as columns, and RSSI values as values
     pivot_table = df.pivot_table(index='address', columns='timestamp', values='rssi', fill_value=0)
 
-    # Set up the heatmap plot
-    fig, ax = plt.subplots(figsize=(10, 8))
-
-    # Map the colors to the address numbers
+    plt.figure(figsize=(10, 8))
     cmap = sns.color_palette("viridis", as_cmap=True)
-    sns.heatmap(pivot_table, cmap=cmap, annot=True, fmt=".0f", cbar=True, ax=ax)
+    sns.heatmap(pivot_table, cmap=cmap, annot=True, fmt=".0f", cbar=True,linewidths=2)
 
-    # Set labels and title
-    ax.set_xlabel('Timestamp')
-    ax.set_ylabel('Address')
-    ax.set_title('RSSI Heatmap')
-
-    # Get the tick positions and labels for the x-axis
+    plt.xlabel('Timestamp')
+    plt.ylabel('Address')
+    plt.title('RSSI Heatmap')
     xticks_pos = np.arange(len(pivot_table.columns)) + 0.5
     xticks_labels = pivot_table.columns.strftime("%H:%M:%S")
-
-    # Set the x-axis tick positions and labels
-    ax.set_xticks(xticks_pos)
-    ax.set_xticklabels(xticks_labels, rotation=45, ha='right')
-
-    # Get the tick positions and labels for the y-axis
+    plt.xticks(xticks_pos, xticks_labels, rotation=45, ha='right')
     yticks_pos = np.arange(len(pivot_table.index)) + 0.5
     yticks_labels = pivot_table.index
+    plt.yticks(yticks_pos, yticks_labels)
 
-    # Set the y-axis tick positions and labels
-    ax.set_yticks(yticks_pos)
-    ax.set_yticklabels(yticks_labels)
-
-    # Convert the plot to an image
     buf = io.BytesIO()
     plt.savefig(buf, format='png')
     buf.seek(0)
@@ -109,8 +89,6 @@ def create_heatmap(ble_devices):
     buf.close()
 
     return image_base64
-
-# ...
 
 async def ble_devices_finder(request):
     if request.method == 'POST':

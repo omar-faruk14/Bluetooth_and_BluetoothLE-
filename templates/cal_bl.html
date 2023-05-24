@@ -21,7 +21,7 @@
         <div class="container">
           <ol>
             <li><a href="{% url 'home' %}">Home</a></li>
-            <li>Find People</li>
+            <li>{{ title }}</li>
           </ol>
         </div>
       </nav>
@@ -29,17 +29,6 @@
 
     <section class="sample-page">
       <div class="container" data-aos="fade-up">
-
-        {% comment %} <p>
-          You can duplicate this sample page and create any number of inner pages you like!
-        </p> {% endcomment %}
-
-      </div>
-      {% comment %} <ul>
-          {% for name in Device_name %}
-              <li>{{ name }}</li>
-          {% endfor %}
-          </ul> {% endcomment %}
           <table class="styled-table center">
               <thead>
                   <tr>
@@ -58,6 +47,7 @@
               {% endfor %}
           </tbody>
               </table>
+            </div>
     </section>
 
   </main>
