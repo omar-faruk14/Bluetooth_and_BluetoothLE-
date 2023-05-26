@@ -9,7 +9,7 @@
       <div class="container position-relative">
         <div class="row d-flex justify-content-center">
           <div class="col-lg-6 text-center">
-            <h2>Data Generator</h2>
+            <h2>データジェネレータ</h2>
             
           </div>
         </div>
@@ -23,27 +23,57 @@
         </ol>
       </div>
     </nav>
-  </div><!-- End Breadcrumbs -->
+</div><!-- End Breadcrumbs -->
 
 <br>
 <div class="container">
     <div class="row">
         <div class="col-md-6 offset-md-3">
-            <h1 class="mt-5 mb-3">Settings</h1>
-            <form method="post" action="{% url 'heatmap_scan' %}">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="loop_count" class="form-label">Number of Loops:</label>
-                    <input type="number" id="loop_count" name="loop_count" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label for="sleep_duration" class="form-label">Sleep Duration (in seconds):</label>
-                    <input type="number" id="sleep_duration" name="sleep_duration" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary" style="background-color: #008374;">Start Scanning</button>
-            </form>
+            <h1 class="mt-5 mb-3">Settings(設定)</h1>
+            <button id="add-heatmap-btn" class="btn btn-primary" style="background-color: #008374;">Add Heatmap</button>
+            <br><br>
+            <div id="heatmap-message" style="display: none;"></div>
         </div>
     </div>
 </div>
-<br>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const addHeatmapBtn = document.getElementById('add-heatmap-btn');
+      const heatmapMessage = document.getElementById('heatmap-message');
+
+      addHeatmapBtn.addEventListener('click', function() {
+          // Simulated BLE device data for demonstration
+          const bleDevices = [
+              { "address": "Device 1", "timestamp": "2023-05-26 10:00:00", "rssi": -50 },
+              { "address": "Device 2", "timestamp": "2023-05-26 10:00:00", "rssi": -60 },
+              { "address": "Device 3", "timestamp": "2023-05-26 10:00:00", "rssi": -70 }
+          ];
+
+          fetch('{% url 'add_heatmap' %}', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': '{{ csrf_token }}'
+              },
+              body: JSON.stringify(bleDevices)
+          })
+          .then(function(response) {
+              if (response.ok) {
+                  heatmapMessage.textContent = 'Heatmap added successfully.';
+                  heatmapMessage.style.display = 'block';
+              } else {
+                  heatmapMessage.textContent = 'Failed to add heatmap.';
+                  heatmapMessage.style.display = 'block';
+              }
+          })
+          .catch(function(error) {
+              heatmapMessage.textContent = 'An error occurred.';
+              heatmapMessage.style.display = 'block';
+          });
+      });
+  });
+</script>
+
+
 {% endblock %}
