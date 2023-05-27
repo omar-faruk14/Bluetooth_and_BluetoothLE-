@@ -10,7 +10,6 @@
         <div class="row d-flex justify-content-center">
           <div class="col-lg-6 text-center">
             <h2>データジェネレータ</h2>
-            
           </div>
         </div>
       </div>
@@ -30,7 +29,13 @@
     <div class="row">
         <div class="col-md-6 offset-md-3">
             <h1 class="mt-5 mb-3">Settings(設定)</h1>
-            <button id="add-heatmap-btn" class="btn btn-primary" style="background-color: #008374;">Add Heatmap</button>
+            <button id="add-heatmap-btn" class="btn btn-primary" style="background-color: #008374;">
+                <span id="button-text">Add Heatmap</span>
+                <span id="button-loader" style="display: none;">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Loading...
+                </span>
+            </button>
             <br><br>
             <div id="heatmap-message" style="display: none;"></div>
         </div>
@@ -40,15 +45,16 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
       const addHeatmapBtn = document.getElementById('add-heatmap-btn');
+      const buttonLoader = document.getElementById('button-loader');
       const heatmapMessage = document.getElementById('heatmap-message');
 
       addHeatmapBtn.addEventListener('click', function() {
           // Simulated BLE device data for demonstration
-          const bleDevices = [
-              { "address": "Device 1", "timestamp": "2023-05-26 10:00:00", "rssi": -50 },
-              { "address": "Device 2", "timestamp": "2023-05-26 10:00:00", "rssi": -60 },
-              { "address": "Device 3", "timestamp": "2023-05-26 10:00:00", "rssi": -70 }
-          ];
+          const bleDevices = [];
+
+          // Disable the button and show the loader
+          addHeatmapBtn.disabled = true;
+          buttonLoader.style.display = 'inline-block';
 
           fetch('{% url 'add_heatmap' %}', {
               method: 'POST',
@@ -56,7 +62,7 @@
                   'Content-Type': 'application/json',
                   'X-CSRFToken': '{{ csrf_token }}'
               },
-              body: JSON.stringify(bleDevices)
+              body: JSON.stringify([])
           })
           .then(function(response) {
               if (response.ok) {
@@ -70,10 +76,15 @@
           .catch(function(error) {
               heatmapMessage.textContent = 'An error occurred.';
               heatmapMessage.style.display = 'block';
+          })
+          .finally(function() {
+              // Re-enable the button and hide the loader
+              addHeatmapBtn.disabled = false;
+              buttonLoader.style.display = 'none';
           });
       });
   });
 </script>
 
-
 {% endblock %}
+

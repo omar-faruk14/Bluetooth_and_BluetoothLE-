@@ -31,7 +31,8 @@
         <h1 class="mt-5 mb-3">Display Heatmaps</h1>
         {% if heatmap_data %}
           {% for heatmap in heatmap_data %}
-            <img src="data:image/png;base64,{{ heatmap }}" alt="Heatmap" class="img-fluid mb-4">
+            <h3>Timestamp: {{ heatmap.timestamp }}</h3>
+            <img src="data:image/png;base64,{{ heatmap.image }}" alt="Heatmap" class="img-fluid mb-4">
           {% endfor %}
         {% else %}
           <p>No heatmaps to display.</p>
