@@ -5,46 +5,70 @@
 
 <!-- ======= Breadcrumbs ======= -->
 <div class="breadcrumbs">
-    <div class="page-header d-flex align-items-center" style="background-image: url('');">
-      <div class="container position-relative">
-        <div class="row d-flex justify-content-center">
-          <div class="col-lg-6 text-center">
-            <h2>データジェネレータ</h2>
-            
-          </div>
+  <div class="page-header d-flex align-items-center" style="background-image: url('');">
+    <div class="container position-relative">
+      <div class="row d-flex justify-content-center">
+        <div class="col-lg-6 text-center">
+          <h2>データジェネレータ</h2>
         </div>
       </div>
     </div>
-    <nav>
-      <div class="container">
-        <ol>
-          <li><a href="{% url 'home' %}">Home</a></li>
-          <li>Find People</li>
-        </ol>
-      </div>
-    </nav>
-  </div><!-- End Breadcrumbs -->
+  </div>
+  <nav>
+    <div class="container">
+      <ol>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li>Find People</li>
+      </ol>
+    </div>
+  </nav>
+</div><!-- End Breadcrumbs -->
 
 <br>
 <div class="container">
-    <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <h1 class="mt-5 mb-3">Settings(設定)</h1>
-            <form method="post" action="{% url 'heatmap_scan' %}">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="loop_count" class="form-label">Number of Loops(ループ数): 測定点の並びと番号</label>
-                    <input type="number" id="loop_count" name="loop_count" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label for="sleep_duration" class="form-label">Sleep Duration-スリープ時間 (in seconds):</label>
-                    <input type="number" id="sleep_duration" name="sleep_duration" class="form-control" required>
-                </div>
-                <p style="color:red">このフォームに入力する値が大きいほど、待ち時間が長くなります。</p>
-                <button type="submit" class="btn btn-primary" style="background-color: #008374;">Start Scanning</button>
-            </form>
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <h1 class="mt-5 mb-3">Settings(設定)</h1>
+      <form method="post" action="{% url 'heatmap_scan' %}" id="scan-form">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="loop_count" class="form-label">Number of Loops(ループ数): 測定点の並びと番号</label>
+          <input type="number" id="loop_count" name="loop_count" class="form-control" required>
         </div>
+        <div class="mb-3">
+          <label for="sleep_duration" class="form-label">Sleep Duration-スリープ時間 (in seconds):</label>
+          <input type="number" id="sleep_duration" name="sleep_duration" class="form-control" required>
+        </div>
+        <p style="color:red">このフォームに入力する値が大きいほど、待ち時間が長くなります。</p>
+        <button type="submit" class="btn btn-primary" id="start-btn" style="background-color: #008374;">
+          Start Scanning
+        </button>
+        <div id="loading-spinner" class="d-none">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Loading...
+        </span>
+          </div>
+        </div>
+      </form>
     </div>
+  </div>
 </div>
 <br>
+
+<script>
+  document.getElementById("scan-form").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent form submission
+
+    // Disable the submit button and show the loading spinner
+    document.getElementById("start-btn").disabled = true;
+    document.getElementById("loading-spinner").classList.remove("d-none");
+
+
+    // Submit the form after a short delay (simulating loading time)
+    setTimeout(function() {
+      event.target.submit();
+    }, 1); // Change the delay time (in milliseconds) as per your preference
+  });
+</script>
+
 {% endblock %}
