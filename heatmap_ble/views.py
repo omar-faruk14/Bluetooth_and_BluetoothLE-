@@ -248,3 +248,5 @@ async def ble_devices_finder(request):
 
     return render(request, 'heatmap.html', {'heatmap_image': heatmap_image,'ble_devices':ble_devices})
 
+def heatmap_all(request):
+    return render(request, 'heatmap_all.html')
