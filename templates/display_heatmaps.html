@@ -1,12 +1,11 @@
 <!-- display_heatmaps.html -->
 {% extends "layout.html" %}
 {% block content %}
-{% load static %}
 <main id="main">
 
   <!-- ======= Breadcrumbs ======= -->
   <div class="breadcrumbs">
-    <div class="page-header d-flex align-items-center" style="background-image: url('');">
+    <div class="page-header d-flex align-items-center" style="background-image: url('path/to/background/image.jpg');">
       <div class="container position-relative">
         <div class="row d-flex justify-content-center">
           <div class="col-lg-6 text-center">
@@ -33,9 +32,7 @@
         <div class="container">
           <div class="row">
             <div class="col-12">
-              
-              <a class="btn btn-success custom-button" href="{%url 'settings'%}">Genarate Heatmaps</a>
-
+              <a class="btn btn-success custom-button" href="{% url 'settings' %}">Generate Heatmaps</a>
             </div>
           </div>
         </div>
@@ -44,12 +41,10 @@
         <div class="container">
           <div class="row">
             <div class="col-12">
-
-        <form method="POST" action="{% url 'remove_heatmap_files' %}">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger p-2">Remove Heatmap Files</button>
-        </form>
-
+              <form method="POST" action="{% url 'remove_heatmap_files' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger p-2">Remove Heatmap Files</button>
+              </form>
             </div>
           </div>
         </div>
@@ -61,22 +56,17 @@
   <div class="container">
     <div class="row">
       <div class="col-md-6 offset-md-3">
-        <h1 class="mt-5 mb-3">Display Heatmaps</h1>
-        {% if heatmap_data %}
-          {% for heatmap in heatmap_data %}
-            <h3>Timestamp: {{ heatmap.timestamp }}</h3>
-            <img src="data:image/png;base64,{{ heatmap.image }}" alt="Heatmap" class="img-fluid mb-4">
-          {% endfor %}
-        {% else %}
-          <p>No heatmaps to display.</p>
-        {% endif %}
-        
-        <form method="POST" action="{% url 'remove_heatmap_files' %}">
-          {% csrf_token %}
-          
-        </form>
+        {% for heatmap in heatmap_data %}
+        <div class="card mb-3">
+          <img src="data:image/png;base64,{{ heatmap.image }}" class="card-img-top" alt="Heatmap Image">
+          <div class="card-body">
+            <p class="card-text">Timestamp: {{ heatmap.timestamp }}</p>
+          </div>
+        </div>
+        {% endfor %}
       </div>
     </div>
   </div>
+
 </main><!-- End #main -->
 {% endblock %}

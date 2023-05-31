@@ -139,48 +139,11 @@ async def scan_ble_devices():
 def settings(request):
     return render(request, 'settings.html')
 
-
-# def display_heatmaps(request):
-#     heatmap_data_with_timestamp = []
-#     for heatmap in heatmap_data:
-#         timestamp = heatmap['timestamp']
-#         image = heatmap['image']
-#         heatmap_with_timestamp = {'timestamp': timestamp, 'image': image}
-#         heatmap_data_with_timestamp.append(heatmap_with_timestamp)
-
-#     save_heatmap_data(heatmap_data_with_timestamp)
-
-#     return render(request, 'display_heatmaps.html', {'heatmap_data': heatmap_data_with_timestamp})
-
-
-
-async def scan_ble_devices():
-    loop_count=5
-    sleep_duration=1
-    ble_devices = []
-    for loop_num in range(1, loop_count + 1):  
-        devices = await BleakScanner.discover()
-        for device in devices:
-            ble_device = {
-                'address': device.address,
-                'timestamp': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                'rssi': device.rssi,
-                'loop_number': loop_num
-            }
-            ble_devices.append(ble_device)
-        time.sleep(sleep_duration)  
-    
-    with open('ble_devices.json', 'w') as file:
-        json.dump(ble_devices, file)
-    return ble_devices
-
-
-def settings(request):
-    return render(request, 'settings.html')
 def remove_heatmap_files(request):
     existing_files = glob.glob('Files/*.json')
     for file in existing_files:
         os.remove(file)
+    heatmap_data.clear()  # Clear the heatmap_data list
     return render(request, 'display_heatmaps.html')
 
 
