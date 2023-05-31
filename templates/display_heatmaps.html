@@ -1,3 +1,4 @@
+<!-- display_heatmaps.html -->
 {% extends "layout.html" %}
 {% block content %}
 {% load static %}
@@ -28,6 +29,12 @@
   <div class="container">
     <div class="row">
       <div class="col-md-6 offset-md-3">
+        <br>
+        <form method="POST" action="{% url 'remove_heatmap_files' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger p-2">Remove Heatmap Files</button>
+        </form>
+        <br>
         <h1 class="mt-5 mb-3">Display Heatmaps</h1>
         {% if heatmap_data %}
           {% for heatmap in heatmap_data %}
@@ -37,6 +44,11 @@
         {% else %}
           <p>No heatmaps to display.</p>
         {% endif %}
+        
+        <form method="POST" action="{% url 'remove_heatmap_files' %}">
+          {% csrf_token %}
+          
+        </form>
       </div>
     </div>
   </div>

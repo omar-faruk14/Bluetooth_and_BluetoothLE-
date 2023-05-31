@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import bluetooth
 import asyncio
-from django.shortcuts import render
 from bleak import BleakScanner
 import datetime
 import matplotlib.pyplot as plt
@@ -13,17 +12,16 @@ import time
 import seaborn as sns
 import numpy as np
 import pandas as pd
+import os
+import glob
 
 
 heatmap_data = []
+
+
 def index(request):
     return HttpResponse("Hello, World!")
 
-def calculate_distance(rssi):
-    tx_power = -59  # the signal strength in dBm at 1 meter distance
-    n = 2.0  # the path-loss exponent (typically between 2.0 and 4.0)
-    distance = 10 ** ((tx_power - rssi) / (10 * n))
-    return distance
 
 def create_heatmap(ble_devices):
     if not ble_devices:
@@ -35,7 +33,7 @@ def create_heatmap(ble_devices):
     pivot_table = df.pivot_table(index='address', columns='timestamp', values='rssi', fill_value=0)
     plt.figure(figsize=(10, 8))
     cmap = sns.color_palette("viridis", as_cmap=True)
-    sns.heatmap(pivot_table, cmap=cmap, annot=True, fmt=".0f", cbar=True, linewidths=2)
+    sns.heatmap(pivot_table, cmap=cmap, annot=True, fmt=".0f", cbar=True, linewidths=2,vmax=0,vmin=-100)
     plt.xlabel('Timestamp')
     plt.ylabel('Address')
     plt.title('RSSI Heatmap')
@@ -58,13 +56,13 @@ def create_heatmap(ble_devices):
     return heatmap
 
 
-
 async def add_heatmap(request):
     ble_devices = await scan_ble_devices()
     if ble_devices:
         heatmap = create_heatmap(ble_devices)
         if heatmap:
             heatmap_data.append(heatmap)
+            save_heatmap_data(heatmap_data)  # Save the heatmap data to a file
             return HttpResponse("Heatmap added successfully.")
         else:
             return HttpResponse("Invalid data format.")
@@ -72,14 +70,48 @@ async def add_heatmap(request):
         return HttpResponse("Invalid request method.")
 
 
+MAX_FILES = 15 
+
+
+def save_heatmap_data(heatmap_data):
+    if not os.path.exists('Files'):
+        os.makedirs('Files')
+    existing_files = glob.glob('Files/*.json')
+    num_existing_files = len(existing_files)
+    if num_existing_files >= MAX_FILES:
+        num_files_to_remove = num_existing_files - MAX_FILES + 1
+        sorted_files = sorted(existing_files, key=os.path.getmtime)
+        files_to_remove = sorted_files[:num_files_to_remove]
+        for file_to_remove in files_to_remove:
+            os.remove(file_to_remove)
+
+    # Save the current heatmap data as a new file
+    filename = f'Files/heatmap_data_{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}.json'
+    with open(filename, 'w') as file:
+        json.dump(heatmap_data, file)
+
+
+def load_heatmap_data():
+    if not os.path.exists('Files'):
+        return []
+    existing_files = glob.glob('Files/*.json')
+    if not existing_files:
+        return []
+    latest_file = max(existing_files, key=os.path.getctime)
+    with open(latest_file, 'r') as file:
+        heatmap_data = json.load(file)
+    return heatmap_data
+
 
 def display_heatmaps(request):
+    heatmap_data = load_heatmap_data()
     heatmap_data_with_timestamp = []
     for heatmap in heatmap_data:
         timestamp = heatmap['timestamp']
         image = heatmap['image']
         heatmap_with_timestamp = {'timestamp': timestamp, 'image': image}
         heatmap_data_with_timestamp.append(heatmap_with_timestamp)
+
     return render(request, 'display_heatmaps.html', {'heatmap_data': heatmap_data_with_timestamp})
 
 
@@ -89,7 +121,6 @@ async def scan_ble_devices():
     ble_devices = []
     for loop_num in range(1, loop_count + 1):  
         devices = await BleakScanner.discover()
-        loop_ble_devices = []
         for device in devices:
             ble_device = {
                 'address': device.address,
@@ -97,11 +128,7 @@ async def scan_ble_devices():
                 'rssi': device.rssi,
                 'loop_number': loop_num
             }
-            loop_ble_devices.append(ble_device)
             ble_devices.append(ble_device)
-        filename = f'ble_devices_loop_{loop_num}.json'
-        with open(filename, 'w') as file:
-            json.dump(loop_ble_devices, file)
         time.sleep(sleep_duration)  
     
     with open('ble_devices.json', 'w') as file:
@@ -111,14 +138,28 @@ async def scan_ble_devices():
 
 def settings(request):
     return render(request, 'settings.html')
-def manual_settings(request):
-    return render(request, 'manual_settings.html')
 
-async def scan_ble_devices2(loop_count, sleep_duration):
+
+# def display_heatmaps(request):
+#     heatmap_data_with_timestamp = []
+#     for heatmap in heatmap_data:
+#         timestamp = heatmap['timestamp']
+#         image = heatmap['image']
+#         heatmap_with_timestamp = {'timestamp': timestamp, 'image': image}
+#         heatmap_data_with_timestamp.append(heatmap_with_timestamp)
+
+#     save_heatmap_data(heatmap_data_with_timestamp)
+
+#     return render(request, 'display_heatmaps.html', {'heatmap_data': heatmap_data_with_timestamp})
+
+
+
+async def scan_ble_devices():
+    loop_count=5
+    sleep_duration=1
     ble_devices = []
-    for loop_num in range(1, loop_count + 1):  # Run the loop five times
+    for loop_num in range(1, loop_count + 1):  
         devices = await BleakScanner.discover()
-        loop_ble_devices = []
         for device in devices:
             ble_device = {
                 'address': device.address,
@@ -126,20 +167,45 @@ async def scan_ble_devices2(loop_count, sleep_duration):
                 'rssi': device.rssi,
                 'loop_number': loop_num
             }
-            loop_ble_devices.append(ble_device)
             ble_devices.append(ble_device)
-
-        # Save loop_ble_devices to a JSON file
-        filename = f'ble_devices_loop_{loop_num}.json'
-        with open(filename, 'w') as file:
-            json.dump(loop_ble_devices, file)
-
-        time.sleep(sleep_duration)  # Wait for 5 seconds before the next loop
-
-    # Save all ble_devices to a JSON file
+        time.sleep(sleep_duration)  
+    
     with open('ble_devices.json', 'w') as file:
         json.dump(ble_devices, file)
+    return ble_devices
 
+
+def settings(request):
+    return render(request, 'settings.html')
+def remove_heatmap_files(request):
+    existing_files = glob.glob('Files/*.json')
+    for file in existing_files:
+        os.remove(file)
+    return render(request, 'display_heatmaps.html')
+
+
+
+
+#========================For Manual Settings=============================================================
+
+def manual_settings(request):
+    return render(request, 'manual_settings.html')
+
+async def scan_ble_devices2(loop_count, sleep_duration):
+    ble_devices = []
+    for loop_num in range(1, loop_count + 1):  
+        devices = await BleakScanner.discover()
+        for device in devices:
+            ble_device = {
+                'address': device.address,
+                'timestamp': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'rssi': device.rssi,
+                'loop_number': loop_num
+            }
+            ble_devices.append(ble_device)
+        time.sleep(sleep_duration)
+    with open('ble_devices.json', 'w') as file:
+        json.dump(ble_devices, file)
     return ble_devices
 
 
@@ -153,7 +219,7 @@ def create_heatmap2(ble_devices):
     pivot_table = df.pivot_table(index='address', columns='timestamp', values='rssi', fill_value=0)
     plt.figure(figsize=(10, 8))
     cmap = sns.color_palette("viridis", as_cmap=True)
-    sns.heatmap(pivot_table, cmap=cmap, annot=True, fmt=".0f", cbar=True,linewidths=2)
+    sns.heatmap(pivot_table, cmap=cmap, annot=True, fmt=".0f", cbar=True,linewidths=2,vmax=0,vmin=-100)
     plt.xlabel('Timestamp')
     plt.ylabel('Address')
     plt.title('RSSI Heatmap')
